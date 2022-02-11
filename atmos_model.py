@@ -86,13 +86,15 @@ def run_atmos_model(albedo=0.3, solar_constant = 1.36e3/4., emiss_atm = 0.2, n_l
     ax.text(850, -120, '{:.0f}'.format(heat_upward[-1]) + r' Wm$^{-2}$', color='red', ha='center', va='top', bbox=dict(facecolor='black', alpha=0.5))
     ax.set_xticks([200, 300, 400, 500, 600, 700, 850, 950], labels=['200', '300', '400', '500', 'solar\ndown', 'solar\nup', 'thermal\nup', 'thermal\ndown'])
     ax.set_yticks([1000, 0], labels=('surface', 'space'))
+    ax.axvline(500, color='black', linewidth=0.75)
     ax.text(350, 0, 'temperature', color='deepskyblue', ha='center')
-    ax.set_title('Super simple atmosphere model')
+    ax.set_title('Multi-layer greenhouse atmosphere model')
     ax.set_ylim(1010, -200)
     ax.set_xlim(200, 1000)
 
 
 b_update = widgets.Button(description='update')
+b_reset = widgets.Button(description='reset sliders')
 sl_albedo = widgets.IntSlider(description='albedo %', min=0, max=90, step=10, value=30, continuous_update=False)
 sl_solar = widgets.IntSlider(description='solar constant %', min=80, max=200, step=10, value=100, continuous_update=False)
 sl_emiss = widgets.IntSlider(description='greenhouse %', min=10, max=100, step=10, value=20, continuous_update=False)
@@ -104,22 +106,26 @@ with output:
     
 def update_plot(b):
     with output:
-        [l.remove() for l in ax.lines]
-        [t.remove() for t in ax.texts]
-        [t.remove() for t in ax.texts]
-        [t.remove() for t in ax.texts]
-        [t.remove() for t in ax.texts]
+        ax.cla()
         run_atmos_model(albedo=sl_albedo.value/100., 
                         solar_constant=1.36e3/4. * sl_solar.value/100.,
                         emiss_atm=sl_emiss.value/100.,
                         n_layers=sl_layers.value)
 
+def reset_values(b):
+    sl_albedo.value = 30
+    sl_solar.value = 100
+    sl_emiss.value = 20
+    sl_layers = 10
+    #update_plot(None)
+
 update_plot(None)
 
 b_update.on_click(update_plot)
+b_reset.on_click(reset_values)
 
 sliders = widgets.VBox([sl_albedo, sl_solar, sl_emiss, sl_layers])
-controls = widgets.HBox([sliders, b_update])
+controls = widgets.HBox([sliders, b_update, b_reset])
 #widgets.VBox([output, controls]) # for some reason it works better if this last line is in the notebook itself
 
 '''# diagnostic printing I did during debugging

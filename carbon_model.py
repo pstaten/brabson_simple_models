@@ -318,10 +318,8 @@ def run_model(ax0, ax1, humans=True, n_iterations = 1000, buffered_up_ocn=False,
     #ax0.set_yscale('log')
     #ax0.set_ylim(300, 4000)
     ax0.set_ylabel(r'Petagrams Carbon (PgC), or 10$^{15}$g')
-    if humans==True:
-        ax0.set_xlabel('years from about 2005')
-    else:
-        ax0.set_xlabel('years from about 1750')
+    ax0.set_xlabel('simulation year')
+    ax0.set_title('Carbon reservoirs over time')
     
     img = mpimg.imread('ccycle_drawing.png')
     ax1.imshow(img, aspect='equal')
@@ -354,14 +352,19 @@ def run_model(ax0, ax1, humans=True, n_iterations = 1000, buffered_up_ocn=False,
     
     net_up_arrow(ax1, 339, 170, -55, sfc2atm-atm2sfc, sfc2atm_n-atm2sfc_n) # net ocean -> atmos
     net_up_arrow(ax1, 951, 148, -23, veg2atm-atm2veg, veg2atm_n-atm2veg_n) # net photo/resp
+    
+    ax1.set_title('Carbon fluxes compared to pre-industrial at year 200.')
 
 b_update = widgets.Button(description='update')
-human_checkbox = widgets.Checkbox(description='on', value=False)
-ocean_down_checkbox = widgets.Checkbox(description='dissolution', value=False)
-ocean_up_checkbox = widgets.Checkbox(description='outgassing', value=False)
-veg_up_checkbox = widgets.Checkbox(description='respiration', value=False)
-veg_down_checkbox = widgets.Checkbox(description='photosynthesis', value=False)
-propo_checkbox = widgets.Checkbox(description='connect', value=False)
+b_reset = widgets.Button(description='reset to defaults')
+human_radio = widgets.RadioButtons(value='pre-industrial', options=['pre-industrial', 'modern'])
+#human_checkbox = widgets.Checkbox(description='on', value=False)
+ocean_down_checkbox = widgets.Checkbox(description=r'$\downarrow$ (dissolution)', value=False)
+ocean_up_checkbox = widgets.Checkbox(description=r'$\uparrow$ (outgassing)', value=False)
+veg_up_checkbox = widgets.Checkbox(description=r'$\uparrow$ (respiration)', value=False)
+veg_down_checkbox = widgets.Checkbox(description=r'$\downarrow$ (photosynthesis)', value=False)
+#propo_checkbox = widgets.Checkbox(description='changing', value=False)
+propo_radio = widgets.RadioButtons(value='constant', options=['constant', 'variable'])
 
 output = widgets.Output()
 with output:
@@ -369,6 +372,14 @@ with output:
     spec = gridspec.GridSpec(ncols=2, nrows=1, width_ratios=[1, 3], wspace=0, hspace=0)
     ax0 = fig.add_subplot(spec[0])
     ax1 = fig.add_subplot(spec[1])
+    
+def clear_boxes(b):
+    human_radio.value='pre-industrial'
+    ocean_down_checkbox.value=False
+    ocean_up_checkbox.value=False
+    veg_up_checkbox.value=False
+    veg_down_checkbox.value=False
+    propo_radio.value='constant'
     
 def update_plot(b):
     with output:
@@ -380,22 +391,22 @@ def update_plot(b):
         #[l.remove() for l in ax1.lines]
         #[t.remove() for t in ax0.texts]
         #[t.remove() for t in ax1.texts]
-        
-        run_model(ax0, ax1, humans=human_checkbox.value, 
+        run_model(ax0, ax1, humans=human_radio.value=='modern', 
                 n_iterations = 200, 
                 buffered_up_ocn=ocean_up_checkbox.value, 
                 buffered_down_ocn=ocean_down_checkbox.value, 
                 buffered_up_veg=veg_up_checkbox.value, 
                 buffered_down_veg=veg_down_checkbox.value,
-                proportionate=propo_checkbox.value)
+                proportionate=propo_radio.value=='variable')
 
 update_plot(None)
 b_update.on_click(update_plot)
+b_reset.on_click(clear_boxes)
 
-humanbox = widgets.VBox([widgets.Label('Modern emissions'), human_checkbox])
+humanbox = widgets.VBox([widgets.Label('Emissions'), human_radio])
 oceanbox = widgets.VBox([widgets.Label('Connect Ocean-Atmos'), ocean_down_checkbox, ocean_up_checkbox])
 veggiebox = widgets.VBox([widgets.Label('Connect Bio-Atmos'), veg_down_checkbox, veg_up_checkbox])
-propobox = widgets.VBox([widgets.Label('Everything Else'), propo_checkbox])
-radioboxes = widgets.HBox([humanbox, oceanbox, veggiebox, propobox])
-controls = widgets.VBox([radioboxes, b_update])
+propobox = widgets.VBox([widgets.Label('Other fluxes'), propo_radio])
+controlboxes = widgets.HBox([humanbox, oceanbox, veggiebox, propobox])
+controls = widgets.VBox([controlboxes, b_update, b_reset])
 # widgets.VBox([output, controls]) # for some reason this works better in the notebook
