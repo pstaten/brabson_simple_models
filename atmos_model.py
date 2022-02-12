@@ -118,7 +118,7 @@ def reset_values(b):
     sl_albedo.value = 30
     sl_solar.value = 100
     sl_emiss.value = 20
-    sl_layers = 10
+    sl_layers.value = 10
     #update_plot(None)
 
 update_plot(None)
