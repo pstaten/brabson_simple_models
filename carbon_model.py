@@ -353,7 +353,7 @@ def run_model(ax0, ax1, humans=True, n_iterations = 1000, buffered_up_ocn=False,
     net_up_arrow(ax1, 339, 170, -55, sfc2atm-atm2sfc, sfc2atm_n-atm2sfc_n) # net ocean -> atmos
     net_up_arrow(ax1, 951, 148, -23, veg2atm-atm2veg, veg2atm_n-atm2veg_n) # net photo/resp
     
-    ax1.set_title('Carbon fluxes compared to pre-industrial at simulation year 200.')
+    ax1.set_title('Carbon fluxes compared to pre-industrial\nat simulation year 200.')
 
 b_update = widgets.Button(description='update')
 b_reset = widgets.Button(description='reset to defaults')
