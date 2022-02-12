@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 def run_atmos_model(albedo=0.3, solar_constant = 1.36e3/4., emiss_atm = 0.2, n_layers = 10):
+    # define a bunch of constants we'll use later
     sb_const = 5.670367e-8 #W⋅m -2
     sp_heat_capacity_water = 4.2e3 # J/kg/Kelvin
     density_water = 1000 # kg/m^3
@@ -13,6 +14,7 @@ def run_atmos_model(albedo=0.3, solar_constant = 1.36e3/4., emiss_atm = 0.2, n_l
 
     t_surf = 273.15 # Kelvins; initial temperature only
 
+    # initialize arrays to hold data later
     emissivity = np.zeros(n_layers) + emiss_atm
     heat_upward = np.zeros(n_layers+1)
     heat_dnward = np.zeros(n_layers+1)
@@ -92,7 +94,7 @@ def run_atmos_model(albedo=0.3, solar_constant = 1.36e3/4., emiss_atm = 0.2, n_l
     ax.set_ylim(1010, -200)
     ax.set_xlim(200, 1000)
 
-
+# create the user interface
 b_update = widgets.Button(description='update')
 b_reset = widgets.Button(description='reset sliders')
 sl_albedo = widgets.IntSlider(description='albedo %', min=0, max=90, step=10, value=30, continuous_update=False)
